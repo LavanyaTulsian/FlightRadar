@@ -1,0 +1,43 @@
+/* ─── StatCard ───────────────────────────────────────────────── */
+.stat-card {
+  --stat-colour: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: border-color 0.2s, background 0.2s;
+  flex: 1;
+  min-width: 120px;
+}
+
+.stat-card:hover {
+  border-color: var(--stat-colour);
+  background: var(--bg-card-hover);
+}
+
+.stat-card__icon {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.stat-card__value {
+  font-family: 'Syne', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--stat-colour);
+  line-height: 1;
+  text-shadow: 0 0 12px currentColor;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-card__label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  text-transform: uppercase;
+}

@@ -1,0 +1,97 @@
+/* ─── Loading Overlay ────────────────────────────────────────── */
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 900;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  background: var(--bg-primary);
+}
+
+/* ─── Radar graphic ──────────────────────────────────────────── */
+.loading-radar {
+  position: relative;
+  width: 160px;
+  height: 160px;
+}
+
+/* Concentric rings */
+.loading-ring {
+  position: absolute;
+  border: 1px solid;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.loading-ring--1 {
+  width: 160px; height: 160px;
+  border-color: rgba(0, 255, 136, 0.15);
+}
+.loading-ring--2 {
+  width: 106px; height: 106px;
+  border-color: rgba(0, 255, 136, 0.2);
+}
+.loading-ring--3 {
+  width: 54px; height: 54px;
+  border-color: rgba(0, 255, 136, 0.25);
+}
+
+/* Rotating sweep (conic gradient sector) */
+.loading-sweep {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    rgba(0, 255, 136, 0)     0deg,
+    rgba(0, 255, 136, 0.35) 60deg,
+    rgba(0, 255, 136, 0)    90deg,
+    transparent             90deg
+  );
+  animation: radar-sweep 2s linear infinite;
+}
+
+@keyframes radar-sweep {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Centre dot */
+.loading-centre {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 12px var(--accent);
+}
+
+/* ─── Text ───────────────────────────────────────────────────── */
+.loading-label {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--accent);
+  text-shadow: 0 0 16px var(--accent-glow);
+  animation: blink 1.2s ease-in-out infinite;
+}
+
+.loading-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}

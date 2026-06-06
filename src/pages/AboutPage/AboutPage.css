@@ -1,0 +1,186 @@
+/* ─── About Page ─────────────────────────────────────────────── */
+.about-page {
+  overflow-y: auto;
+  min-height: 100vh;
+  padding-bottom: 64px;
+}
+
+/* ─── Hero ───────────────────────────────────────────────────── */
+.about-hero {
+  padding: 80px 32px 64px;
+  max-width: 800px;
+  position: relative;
+}
+
+.about-hero__icon {
+  font-size: 40px;
+  color: var(--accent);
+  text-shadow: 0 0 24px var(--accent-glow);
+  margin-bottom: 16px;
+  animation: spin-slow 12s linear infinite;
+  display: inline-block;
+}
+
+.about-hero__sub {
+  margin-top: 24px;
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  max-width: 600px;
+}
+
+/* ─── Content ────────────────────────────────────────────────── */
+.about-content {
+  padding: 0 32px;
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 40px;
+  align-items: start;
+}
+
+/* ─── Info blocks ────────────────────────────────────────────── */
+.about-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.about-info-block {
+  padding: 28px 0;
+  border-bottom: 1px solid var(--border);
+}
+.about-info-block:first-child { padding-top: 0; }
+
+.about-info-q {
+  font-family: 'Syne', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.about-info-a {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.85;
+}
+
+.about-info-a p + p { margin-top: 10px; }
+
+/* ─── Tech stack sidebar ─────────────────────────────────────── */
+.about-stack {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px 24px;
+  position: sticky;
+  top: calc(var(--nav-h) + 16px);
+}
+
+.about-stack__heading {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+.about-stack ul { list-style: none; display: flex; flex-direction: column; gap: 0; }
+
+.about-stack-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(0, 255, 136, 0.05);
+}
+.about-stack-item:last-child { border-bottom: none; }
+
+.about-stack-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.about-stack-name {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.about-stack-role {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ─── API attribution card ───────────────────────────────────── */
+.about-api-card {
+  margin-top: 24px;
+  padding: 16px;
+  background: var(--accent-trace);
+  border: 1px solid var(--border-hover);
+  border-radius: var(--radius);
+}
+
+.about-api-card__title {
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--accent-dim);
+  margin-bottom: 8px;
+}
+
+.about-api-card__body {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.about-api-endpoint {
+  margin-top: 10px;
+  font-size: 10px;
+  color: var(--accent-dim);
+  letter-spacing: 0.5px;
+  word-break: break-all;
+}
+
+.about-link {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: var(--accent-trace);
+  transition: text-decoration-color 0.2s;
+}
+.about-link:hover { text-decoration-color: var(--accent); }
+
+/* ─── Disclaimer ─────────────────────────────────────────────── */
+.about-disclaimer {
+  margin: 48px 32px 0;
+  padding: 20px 24px;
+  background: rgba(255, 71, 87, 0.05);
+  border: 1px solid rgba(255, 71, 87, 0.15);
+  border-radius: var(--radius);
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.about-disclaimer strong { color: var(--text-secondary); }
+
+/* ─── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .about-grid { grid-template-columns: 1fr; }
+  .about-stack { position: static; }
+}
+
+@media (max-width: 768px) {
+  .about-hero { padding: 40px 16px 40px; }
+  .about-content { padding: 0 16px; }
+  .about-disclaimer { margin: 32px 16px 0; }
+}
