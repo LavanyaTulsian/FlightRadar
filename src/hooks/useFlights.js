@@ -72,6 +72,7 @@ export function useFlights() {
       if (!res.ok) throw new Error(`OpenSky API returned HTTP ${res.status}`);
 
       const data = await res.json();
+      console.log('useFlights: fetched data', data && { stateCount: Array.isArray(data.states) ? data.states.length : 0 });
 
       if (!mountedRef.current) return;
 

@@ -70,6 +70,7 @@ function MapClickHandler({ onDeselect }) {
 
 /* ─── Main component ─────────────────────────────────────────── */
 export default function FlightMap({ flights, selectedFlight, onSelectFlight }) {
+  console.log('FlightMap render', { flights: flights.length, selectedFlight: selectedFlight?.icao24 });
 
   // Memoize icon creation — only recalculate when selected flight changes
   const getIcon = useCallback(

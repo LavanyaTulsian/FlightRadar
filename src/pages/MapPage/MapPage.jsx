@@ -16,6 +16,33 @@ import LoadingSpinner        from '../../components/LoadingSpinner/LoadingSpinne
 import StatCard              from '../../components/StatCard/StatCard';
 import { timeAgo }           from '../../utils/flightHelpers';
 
+class MapErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, info) {
+    console.error('MapErrorBoundary caught error:', error, info);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="map-error" role="alert">
+          <p>Unable to render the interactive map.</p>
+          <pre>{String(this.state.error)}</pre>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default function MapPage() {
   const {
     flights, loading, error, lastUpdated,
@@ -24,6 +51,14 @@ export default function MapPage() {
 
   const [selectedFlight, setSelectedFlight] = useState(null);
   const [showOnlyAirborne, setShowOnlyAirborne] = useState(false);
+
+  console.log('MapPage render', {
+    loading,
+    flights: flights.length,
+    error,
+    usingMock,
+    selectedFlight: selectedFlight?.icao24 ?? null,
+  });
 
   // Filtered flights for the map
   const displayFlights = useMemo(
@@ -121,19 +156,19 @@ export default function MapPage() {
         {loading ? (
           <LoadingSpinner />
         ) : (
-          <FlightMap
-            flights={displayFlights}
-            selectedFlight={selectedFlight}
-            onSelectFlight={setSelectedFlight}
-          />
-        )}
-
-        {/* Detail panel slides in when a flight is selected */}
-        {selectedFlight && !loading && (
-          <FlightPanel
-            flight={selectedFlight}
-            onClose={() => setSelectedFlight(null)}
-          />
+          <MapErrorBoundary>
+            <FlightMap
+              flights={displayFlights}
+              selectedFlight={selectedFlight}
+              onSelectFlight={setSelectedFlight}
+            />
+            {selectedFlight && (
+              <FlightPanel
+                flight={selectedFlight}
+                onClose={() => setSelectedFlight(null)}
+              />
+            )}
+          </MapErrorBoundary>
         )}
 
         {/* Map legend */}
