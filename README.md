@@ -1,6 +1,6 @@
-# ✈️ FlightScope — Live Air Traffic Radar
+# ✈️ FlightRadar — Live Air Traffic Radar
 
-A real-time global air traffic visualization application powered by OpenSky Network ADS-B data. FlightScope provides an interactive interface to explore, monitor, and analyze aircraft positions, flight details, and aviation statistics worldwide.
+A real-time global air traffic visualization application powered by OpenSky Network ADS-B data. FlightRadar provides an interactive interface to explore, monitor, and analyze aircraft positions, flight details, and aviation statistics worldwide.
 
 ---
 
