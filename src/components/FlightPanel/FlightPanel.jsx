@@ -9,7 +9,7 @@ import './FlightPanel.css';
 import {
   formatAltitude, formatSpeed, formatVertRate,
   msToKnots, mToFL, getAltitudeColour, getCountryFlag,
-  formatTimestamp,
+  formatTimestamp, timeAgo,
 } from '../../utils/flightHelpers';
 
 /* ─── Sub-components ─────────────────────────────────────────── */
@@ -126,6 +126,11 @@ export default function FlightPanel({ flight, onClose }) {
           <DataRow label="HEADING"   value={`${Math.round(flight.heading ?? 0)}°`} />
           <DataRow label="VERT RATE" value={formatVertRate(flight.verticalRate)} />
           <DataRow label="SQUAWK"    value={flight.squawk ?? '—'} />
+          <DataRow label="LAST CONTACT" value={formatTimestamp(flight.lastContact)} />
+          <DataRow
+            label="DATA AGE"
+            value={timeAgo(flight.lastContact ? new Date(flight.lastContact * 1000) : null)}
+          />
         </section>
 
         {/* Position */}

@@ -76,6 +76,11 @@ A real-time global air traffic visualization application powered by OpenSky Netw
    npm install
    ```
 
+   If you encounter peer dependency warnings during install, run:
+   ```bash
+   npm install --legacy-peer-deps
+   ```
+
 ### Running the Application
 
 #### Development Mode

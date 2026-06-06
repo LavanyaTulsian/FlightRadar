@@ -8,9 +8,14 @@
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  transition: border-color 0.2s, background 0.2s;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
   flex: 1;
   min-width: 120px;
+  animation: fade-in-up 0.35s ease both;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
 }
 
 .stat-card:hover {

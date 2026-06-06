@@ -15,6 +15,7 @@
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
   flex-wrap: wrap;
+  animation: fade-in 0.35s ease both;
 }
 
 .map-hud__cards {
@@ -134,6 +135,7 @@
   padding: 12px 14px;
   backdrop-filter: blur(8px);
   min-width: 110px;
+  animation: fade-in 0.35s ease both;
 }
 
 .map-legend__title {
@@ -162,13 +164,33 @@
 }
 
 /* ─── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 992px) {
+  .map-stage {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .map-hud { padding: 10px 14px; }
+  .map-hud__cards { width: 100%; }
+  .map-hud__cards .stat-card { min-width: 0; padding: 8px 12px; }
+  .map-hud__cards .stat-card__value { font-size: 16px; }
+  .map-legend {
+    left: auto;
+    right: 12px;
+    bottom: 12px;
+  }
+}
+
 @media (max-width: 768px) {
   .map-hud { padding: 8px 12px; }
   .map-hud__cards .stat-card { min-width: 0; padding: 8px 12px; }
   .map-hud__cards .stat-card__value { font-size: 16px; }
-  .map-legend { display: none; }   /* hide legend on small screens */
+  .map-hud__right { width: 100%; justify-content: space-between; }
+  .map-legend { display: none; }
 }
 
 @media (max-width: 480px) {
+  .map-hud { flex-direction: column; align-items: stretch; }
   .map-hud__right { width: 100%; justify-content: space-between; }
+  .map-stage { min-height: calc(100vh - var(--nav-h) - 130px); }
 }

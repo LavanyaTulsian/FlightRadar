@@ -14,7 +14,7 @@ import './AboutPage.css';
 const TECH_STACK = [
   { name: 'React 19',         role: 'UI Framework',         colour: '#61dafb' },
   { name: 'React Router v6',  role: 'Client-side routing',  colour: '#f44250' },
-  { name: 'React-Leaflet 4',  role: 'Interactive maps',     colour: '#3d8fff' },
+  { name: 'Leaflet',          role: 'Interactive maps',     colour: '#3d8fff' },
   { name: 'Recharts',         role: 'Data visualisation',   colour: '#ffaa00' },
   { name: 'Vite 8',           role: 'Build tool / dev server', colour: '#646cff' },
   { name: 'OpenSky Network',  role: 'Live ADS-B API',       colour: '#00ff88' },
