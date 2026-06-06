@@ -82,9 +82,9 @@ export default function FlightMap({ flights, selectedFlight, onSelectFlight }) {
     [selectedFlight]
   );
 
-  // Only show airborne + on-ground flights that have valid positions
+  // Only show flights whose lat/long are explicitly defined
   const renderable = useMemo(
-    () => flights.filter(f => f.latitude && f.longitude),
+    () => flights.filter(f => f.latitude != null && f.longitude != null),
     [flights]
   );
 

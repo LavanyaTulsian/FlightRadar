@@ -75,8 +75,10 @@ export function useFlights() {
 
       if (!mountedRef.current) return;
 
+      const states = Array.isArray(data?.states) ? data.states : [];
+
       // Parse, filter nulls, and cap at MAX_DISPLAY
-      const parsed = data.states
+      const parsed = states
         .map(parseState)
         .filter(Boolean)
         .slice(0, MAX_DISPLAY);
