@@ -26,6 +26,8 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { MOCK_FLIGHTS } from '../utils/mockData';
 
 const OPENSKY_URL      = 'https://opensky-network.org/api/states/all';
+// Public CORS proxy fallback — used only when direct fetch fails in the browser
+const CORS_PROXY       = 'https://api.allorigins.win/raw?url=';
 const REFRESH_MS       = 15_000;   // 15 s — respects OpenSky anonymous rate limit
 const MAX_DISPLAY      = 600;      // cap renders for performance
 
@@ -62,26 +64,49 @@ export function useFlights() {
   const mountedRef = useRef(true);
 
   const fetchFlights = useCallback(async () => {
+    // Try the real API first. If it fails (commonly due to CORS in browsers),
+    // attempt a one-time fallback via a public CORS proxy before using mock data.
+    let triedProxy = false;
     try {
-      const controller = new AbortController();
-      const timeout    = setTimeout(() => controller.abort(), 12_000); // 12 s timeout
+      const doFetch = async (url) => {
+        const controller = new AbortController();
+        const timeout    = setTimeout(() => controller.abort(), 12_000); // 12 s timeout
+        try {
+          const res = await fetch(url, { signal: controller.signal });
+          clearTimeout(timeout);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.json();
+        } finally {
+          clearTimeout(timeout);
+        }
+      };
 
-      const res = await fetch(OPENSKY_URL, { signal: controller.signal });
-      clearTimeout(timeout);
+      let data;
+      try {
+        data = await doFetch(OPENSKY_URL);
+      } catch (firstErr) {
+        // If the direct fetch failed in the browser (network/CORS), try the proxy once
+        console.warn('[useFlights] direct fetch failed, attempting proxy:', firstErr.message);
+        triedProxy = true;
+        const proxied = `${CORS_PROXY}${encodeURIComponent(OPENSKY_URL)}`;
+        data = await doFetch(proxied);
+      }
 
-      if (!res.ok) throw new Error(`OpenSky API returned HTTP ${res.status}`);
-
-      const data = await res.json();
-      console.log('useFlights: fetched data', data && { stateCount: Array.isArray(data.states) ? data.states.length : 0 });
-
+      console.log('useFlights: fetched data', data && { stateCount: Array.isArray(data.states) ? data.states.length : 0, triedProxy });
       if (!mountedRef.current) return;
 
       const states = Array.isArray(data?.states) ? data.states : [];
 
-      // Parse, filter nulls, and cap at MAX_DISPLAY
+      // Parse, filter nulls, dedupe by icao24, and cap at MAX_DISPLAY
+      const seen = new Set();
       const parsed = states
         .map(parseState)
         .filter(Boolean)
+        .filter(p => {
+          if (seen.has(p.icao24)) return false;
+          seen.add(p.icao24);
+          return true;
+        })
         .slice(0, MAX_DISPLAY);
 
       setFlights(parsed);
@@ -92,7 +117,7 @@ export function useFlights() {
       if (!mountedRef.current) return;
 
       // Fall back to mock data so the UI remains functional
-      console.warn('[useFlights] API unavailable, using mock data:', err.message);
+      console.warn('[useFlights] API unavailable after proxy attempt, using mock data:', err.message);
       setFlights(MOCK_FLIGHTS);
       setError(err.message);
       setUsingMock(true);

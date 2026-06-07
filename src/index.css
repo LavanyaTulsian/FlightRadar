@@ -60,6 +60,8 @@
 html {
   scroll-behavior: smooth;
   height: 100%;
+  /* Fluid base font size for better readability across devices */
+  font-size: clamp(13px, 1.6vw, 16px);
 }
 
 body {
@@ -67,7 +69,7 @@ body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: 14px;
+  font-size: 1rem; /* uses html font-size */
   line-height: 1.6;
   /* Subtle grid overlay for radar effect */
   background-image:

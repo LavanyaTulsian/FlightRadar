@@ -183,6 +183,8 @@
 
 @media (max-width: 768px) {
   .map-hud { padding: 8px 12px; }
+  /* Hide the HUD stat strip on small screens to avoid duplication with the mobile menu */
+  .map-hud__cards { display: none; }
   .map-hud__cards .stat-card { min-width: 0; padding: 8px 12px; }
   .map-hud__cards .stat-card__value { font-size: 16px; }
   .map-hud__right { width: 100%; justify-content: space-between; }

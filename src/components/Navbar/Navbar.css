@@ -151,6 +151,22 @@
   padding: 8px 0;
 }
 
+.navbar__mobile-stats {
+  padding: 8px 12px 12px 12px;
+}
+.navbar__mobile-stats-inner {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+.navbar__mobile-stats .stat-card {
+  min-width: 100px;
+  padding: 8px 12px;
+}
+.navbar__mobile-stats .stat-card__value { font-size: 16px; }
+.navbar__mobile-stats .stat-card__label  { font-size: 9px; }
+
 .navbar__mobile-link {
   display: flex;
   align-items: center;

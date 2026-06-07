@@ -11,6 +11,8 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation }        from 'react-router-dom';
 import './Navbar.css';
+import { useFlights } from '../../hooks/useFlights';
+import StatCard from '../StatCard/StatCard';
 
 const NAV_LINKS = [
   { path: '/',            label: 'RADAR',      icon: '◎' },
@@ -23,6 +25,7 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [utcTime,  setUtcTime]  = useState('');
   const location = useLocation();
+  const { totalCount, airborneCount, groundCount } = useFlights();
 
   // Close mobile menu on route change
   useEffect(() => setMenuOpen(false), [location.pathname]);
@@ -102,6 +105,15 @@ export default function Navbar() {
           className="navbar__mobile-menu animate-fade-in"
           aria-label="Mobile navigation"
         >
+          {/* Live stats shown in the mobile dropdown for compact screens */}
+          <div className="navbar__mobile-stats">
+            <div className="navbar__mobile-stats-inner">
+              <StatCard label="TOTAL" value={totalCount.toLocaleString()} icon="◎" colour="var(--accent)" />
+              <StatCard label="AIRBORNE" value={airborneCount.toLocaleString()} icon="✈" colour="var(--sky)" />
+              <StatCard label="GROUND" value={groundCount.toLocaleString()} icon="▼" colour="var(--amber)" />
+            </div>
+          </div>
+
           <ul role="list">
             {NAV_LINKS.map(({ path, label, icon }) => (
               <li key={path}>
