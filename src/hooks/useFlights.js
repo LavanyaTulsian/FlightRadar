@@ -1,55 +1,56 @@
 /**
  * useFlights.js
- * Custom hook that fetches live aircraft state vectors from the
- * OpenSky Network REST API and refreshes every 15 seconds.
+ * Custom hook that fetches live aircraft data from the
+ * AirLabs API and refreshes every 15 seconds.
  *
- * API docs: https://openskynetwork.github.io/opensky-api/rest.html
- * Endpoint: GET /api/states/all
+ * API docs: https://airlabs.co/docs/flights
+ * Endpoint: GET https://airlabs.co/api/v9/flights?api_key=YOUR_KEY
  *
- * Each state vector array index maps to:
- *  [0]  icao24          — ICAO 24-bit transponder address
- *  [1]  callsign        — Aircraft callsign
- *  [2]  origin_country  — Country of origin
- *  [3]  time_position   — Unix timestamp of last position update
- *  [4]  last_contact    — Unix timestamp of last update
- *  [5]  longitude       — WGS-84 longitude (deg)
- *  [6]  latitude        — WGS-84 latitude  (deg)
- *  [7]  baro_altitude   — Barometric altitude (m)
- *  [8]  on_ground       — Boolean
- *  [9]  velocity        — Ground speed (m/s)
- *  [10] true_track      — True heading (deg, clockwise from North)
- *  [11] vertical_rate   — Vertical rate (m/s, positive = climbing)
- *  [14] squawk          — Transponder code
+ * AirLabs response format:
+ *  hex          — ICAO 24-bit transponder address (primary key)
+ *  flight_iata  — IATA flight number
+ *  flight_icao  — ICAO flight number
+ *  lat          — WGS-84 latitude
+ *  lng          — WGS-84 longitude
+ *  alt          — Altitude in feet
+ *  dir          — Heading in degrees
+ *  speed        — Ground speed in knots
+ *  v_speed      — Vertical speed in feet/minute
+ *  dep_iata     — Departure airport IATA
+ *  arr_iata     — Arrival airport IATA
+ *  flag         — Country flag code
+ *  aircraft_icao— Aircraft type ICAO code
+ *  squawk       — Transponder code
+ *  updated      — Unix timestamp of last update
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { MOCK_FLIGHTS } from '../utils/mockData';
 
-const OPENSKY_URL      = 'https://opensky-network.org/api/states/all';
-// Public CORS proxy fallback — used only when direct fetch fails in the browser
-const CORS_PROXY       = 'https://api.allorigins.win/raw?url=';
-const REFRESH_MS       = 15_000;   // 15 s — respects OpenSky anonymous rate limit
+const AIRLABS_URL      = 'https://airlabs.co/api/v9/flights';
+const REFRESH_MS       = 15_000;   // 15 s — respects rate limit
 const MAX_DISPLAY      = 600;      // cap renders for performance
 
 /**
- * Parse a raw OpenSky state-vector array into a clean flight object.
- * Returns null if lat/lon are missing (unusable for the map).
+ * Parse an AirLabs flight object into our standardized flight format.
+ * Returns null if lat/lng are missing (unusable for the map).
  */
-function parseState(s) {
-  if (s[5] === null || s[6] === null) return null;
+function parseState(flight) {
+  if (flight.lat == null || flight.lng == null) return null;
+
   return {
-    icao24:       s[0]  ?? 'unknown',
-    callsign:     (s[1] ?? '').trim() || 'N/A',
-    country:      s[2]  ?? 'Unknown',
-    longitude:    s[5],
-    latitude:     s[6],
-    altitude:     s[7]  ?? 0,          // metres, barometric
-    onGround:     s[8]  ?? false,
-    velocity:     s[9]  ?? 0,          // m/s
-    heading:      s[10] ?? 0,          // degrees true
-    verticalRate: s[11] ?? 0,          // m/s
-    squawk:       s[14] ?? '----',
-    lastContact:  s[4]  ?? null,
+    icao24:       flight.hex ?? 'unknown',
+    callsign:     (flight.flight_iata || flight.flight_icao || '').trim() || 'N/A',
+    country:      flight.flag ?? 'Unknown',
+    longitude:    flight.lng,
+    latitude:     flight.lat,
+    altitude:     (flight.alt ?? 0) * 0.3048, // convert feet to metres for consistency
+    onGround:     flight.alt === 0 || flight.alt == null,
+    velocity:     (flight.speed ?? 0) * 0.51444, // convert knots to m/s
+    heading:      flight.dir ?? 0,              // already in degrees
+    verticalRate: (flight.v_speed ?? 0) * 0.00508, // convert ft/min to m/s
+    squawk:       flight.squawk ?? '----',
+    lastContact:  flight.updated ? flight.updated * 1000 : null, // convert to milliseconds
   };
 }
 
@@ -64,42 +65,44 @@ export function useFlights() {
   const mountedRef = useRef(true);
 
   const fetchFlights = useCallback(async () => {
-    // Try the real API first. If it fails (commonly due to CORS in browsers),
-    // attempt a one-time fallback via a public CORS proxy before using mock data.
-    let triedProxy = false;
-    try {
-      const doFetch = async (url) => {
-        const controller = new AbortController();
-        const timeout    = setTimeout(() => controller.abort(), 12_000); // 12 s timeout
-        try {
-          const res = await fetch(url, { signal: controller.signal });
-          clearTimeout(timeout);
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          return res.json();
-        } finally {
-          clearTimeout(timeout);
-        }
-      };
+    const apiKey = import.meta.env.VITE_AIRLABS_API_KEY;
+    
+    // If no API key is configured, use demo data
+    if (!apiKey || apiKey === 'your_api_key_here') {
+      if (!mountedRef.current) return;
+      setFlights(MOCK_FLIGHTS);
+      setError(null);
+      setUsingMock(true);
+      setLoading(false);
+      console.info('[useFlights] Using sample data. Add your AirLabs API key to .env.local to enable live data.');
+      return;
+    }
 
-      let data;
-      try {
-        data = await doFetch(OPENSKY_URL);
-      } catch (firstErr) {
-        // If the direct fetch failed in the browser (network/CORS), try the proxy once
-        console.warn('[useFlights] direct fetch failed, attempting proxy:', firstErr.message);
-        triedProxy = true;
-        const proxied = `${CORS_PROXY}${encodeURIComponent(OPENSKY_URL)}`;
-        data = await doFetch(proxied);
+    // Try to fetch real data from AirLabs
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 12_000); // 12s timeout
+
+      const url = `${AIRLABS_URL}?api_key=${apiKey}`;
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeout);
+
+      if (!res.ok) throw new Error(`AirLabs API returned HTTP ${res.status}`);
+
+      const data = await res.json();
+      
+      if (data.error) {
+        throw new Error(`AirLabs error: ${data.error[0]?.message || 'Unknown error'}`);
       }
 
-      console.log('useFlights: fetched data', data && { stateCount: Array.isArray(data.states) ? data.states.length : 0, triedProxy });
+      console.log('useFlights: fetched AirLabs data', { flightCount: Array.isArray(data.response) ? data.response.length : 0 });
       if (!mountedRef.current) return;
 
-      const states = Array.isArray(data?.states) ? data.states : [];
+      const flights = Array.isArray(data.response) ? data.response : [];
 
       // Parse, filter nulls, dedupe by icao24, and cap at MAX_DISPLAY
       const seen = new Set();
-      const parsed = states
+      const parsed = flights
         .map(parseState)
         .filter(Boolean)
         .filter(p => {
@@ -116,10 +119,10 @@ export function useFlights() {
     } catch (err) {
       if (!mountedRef.current) return;
 
-      // Fall back to mock data so the UI remains functional
-      console.warn('[useFlights] API unavailable after proxy attempt, using mock data:', err.message);
+      // Fall back to demo data on any API error
+      console.warn('[useFlights] AirLabs fetch failed, using sample data:', err.message);
       setFlights(MOCK_FLIGHTS);
-      setError(err.message);
+      setError(null);
       setUsingMock(true);
     } finally {
       if (mountedRef.current) setLoading(false);

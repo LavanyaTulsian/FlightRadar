@@ -1,6 +1,6 @@
 # ✈️ FlightRadar — Live Air Traffic Radar
 
-A real-time global air traffic visualization application powered by OpenSky Network ADS-B data. FlightRadar provides an interactive interface to explore, monitor, and analyze aircraft positions, flight details, and aviation statistics worldwide.
+A real-time global air traffic visualization application powered by AirLabs API. FlightRadar provides an interactive interface to explore, monitor, and analyze aircraft positions, flight details, and aviation statistics worldwide.
 
 ---
 
@@ -11,6 +11,7 @@ A real-time global air traffic visualization application powered by OpenSky Netw
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
+  - [API Setup](#api-setup)
   - [Running the Application](#running-the-application)
 - [Project Structure](#project-structure)
 - [Pages & Features](#pages--features)
@@ -29,7 +30,7 @@ A real-time global air traffic visualization application powered by OpenSky Netw
 - **✈️ Flights Table** — Sortable and filterable table with detailed flight information
 - **📊 Statistics Dashboard** — Data visualizations and analytics powered by Recharts
 - **ℹ️ About Section** — Information about the application and API attribution
-- **🔄 Real-time Updates** — Live flight data from OpenSky Network
+- **🔄 Real-time Updates** — Live flight data from AirLabs API
 - **📱 Responsive Design** — Optimized for desktop and mobile viewing
 - **⚡ Fast Development** — Built with Vite for instant HMR and optimized builds
 
@@ -41,9 +42,10 @@ A real-time global air traffic visualization application powered by OpenSky Netw
 |----------|--------------|
 | **Frontend Framework** | React 19.2 |
 | **Routing** | React Router DOM 6.24 |
-| **Mapping** | Leaflet 1.9 + React-Leaflet 4.2 |
+| **Mapping** | Leaflet 1.9 |
 | **Data Visualization** | Recharts 2.15 |
 | **Build Tool** | Vite 8.0 |
+| **Flight Data** | AirLabs API |
 | **Styling** | CSS (38.8%) |
 | **Code Quality** | ESLint 9.39 |
 | **Package Manager** | npm |
@@ -62,6 +64,7 @@ A real-time global air traffic visualization application powered by OpenSky Netw
 - **Node.js** 16.0 or higher
 - **npm** 7.0 or higher
 - A modern web browser (Chrome, Firefox, Safari, Edge)
+- **AirLabs API Key** (free tier available at https://airlabs.co/signup)
 
 ### Installation
 
@@ -78,6 +81,31 @@ A real-time global air traffic visualization application powered by OpenSky Netw
 
    If you encounter peer dependency warnings during install, run:
    ```bash
+   npm install --legacy-peer-deps
+   ```
+
+### API Setup
+
+**AirLabs provides a free tier (1,000 queries/month) — perfect for personal use and testing.**
+
+1. **Get your free API key:**
+   - Visit: https://airlabs.co/signup
+   - Sign up with your email (no credit card required)
+   - Copy your API key from the dashboard
+
+2. **Configure the API key locally:**
+   - Create a `.env.local` file in the project root:
+     ```bash
+     VITE_AIRLABS_API_KEY=your_api_key_here
+     ```
+   - Replace `your_api_key_here` with your actual API key from step 1
+   - **Important:** `.env.local` is ignored by git and will NOT be committed (keep your key safe!)
+
+3. **Verify the setup:**
+   - Start the dev server: `npm run dev`
+   - Open the browser console (F12)
+   - You should see `useFlights: fetched AirLabs data` logs
+   - If you see an error about the API key, check that `.env.local` exists and the key is correct
    npm install --legacy-peer-deps
    ```
 
@@ -236,11 +264,18 @@ npm run build
 
 ## 📡 Data Attribution
 
-This application uses real-time air traffic data from the **[OpenSky Network](https://opensky-network.org/)**, which collects ADS-B (Automatic Dependent Surveillance-Broadcast) signals.
+This application uses real-time air traffic data from the **[AirLabs API](https://airlabs.co/)**, which provides comprehensive global flight tracking data.
 
-**OpenSky Network Terms:**
-- Data is provided under the terms of use specified by OpenSky Network
-- See [OpenSky Network Legal Notice](https://opensky-network.org/about/terms-of-use) for details
+**AirLabs Terms:**
+- Free tier: 1,000 queries/month (personal use)
+- Paid tiers available for higher volume requirements
+- See [AirLabs Terms of Service](https://airlabs.co/terms-of-service) for full details
+- Data sourced from global ADS-B and Mode-S network feeds
+
+**API Key Requirements:**
+- Free API key available at https://airlabs.co/signup
+- No credit card required for the free tier
+- Keep your API key secure — never commit it to version control
 
 ---
 
